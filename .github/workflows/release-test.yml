@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Compress
-        run: tar -zcvf scan2html.tar.gz scan2html.sh plugin.yaml
+        run: tar -zcvf scan2html.tar.gz scan2html.sh pre-release/plugin.yaml
 
       - name: Release
         uses: softprops/action-gh-release@v1
