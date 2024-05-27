@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      reportTemplate: 'report_template.html'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          working-directory: src/frontend-app
+
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: src/frontend-app
+
+      - name: Build project
+        run: |
+          pwd
+          cd src/frontend-app/
+          npm run build
+
+      - name: Preparing report_template.html
+        run: |
+          # copy js files
+          cat
+          {
+          # copy report file except the last 4 lines
+          head -n -4 'src/frontend-app/dist/src/assets/app-template.html'
+          echo ''
+          cat 'src/frontend-app/dist/app.js'
+          echo ''
+          echo '</script>'
+          echo '</body>'
+          echo '</html>'
+          } >"$reportTemplate"
+          
+          cat "$reportTemplate"
+      - name: Compress
+        run: tar -zcvf scan2html.tar.gz scan2html.sh "$reportTemplate" LICENSE results.json plugin.yaml
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            scan2html.tar.gz
