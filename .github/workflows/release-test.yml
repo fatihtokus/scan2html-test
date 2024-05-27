@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - develop
 
 jobs:
   build:
@@ -16,40 +16,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          working-directory: src/frontend-app
-
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: src/frontend-app
-
-      - name: Build project
-        run: |
-          pwd
-          cd src/frontend-app/
-          npm run build
-
-      - name: Preparing report_template.html
-        run: |
-          # copy js files
-          cat
-          {
-          # copy report file except the last 4 lines
-          head -n -4 'src/frontend-app/dist/src/assets/app-template.html'
-          echo ''
-          cat 'src/frontend-app/dist/app.js'
-          echo ''
-          echo '</script>'
-          echo '</body>'
-          echo '</html>'
-          } >"$reportTemplate"
-          
-          cat "$reportTemplate"
       - name: Compress
-        run: tar -zcvf scan2html.tar.gz scan2html.sh "$reportTemplate" LICENSE results.json plugin.yaml
+        run: tar -zcvf README.md
 
       - name: Release
         uses: softprops/action-gh-release@v1
