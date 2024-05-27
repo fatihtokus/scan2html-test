@@ -1,0 +1,26 @@
+name: Security scanning
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: aquasec/trivy
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Scan with Trivy and scan2html
+        run: |
+          pwd
+          cd src/frontend-app/
+          npm run build
+          apk update && apk add curl jq bash git
+          trivy plugin install github.com/fatihtokus/scan2html
+          trivy plugin list
+          trivy scan2html fs --scanners vuln,misconfig --exit-code 0 . interactive_fs_scan_report.html
+      - name: Report
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            interactive_fs_scan_report.html
